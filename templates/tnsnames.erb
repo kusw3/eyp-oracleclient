@@ -1,0 +1,24 @@
+<%= @csname %><% if defined?(@csalias) %>,<%= @csalias.join(',') %><% end %> =
+<% if @host.kind_of?(Array) -%>
+(DESCRIPTION_LIST=
+  (LOAD_BALANCE=<%= @loadbalance %>)
+  (FAILOVER=<%= @failover %>)
+<% @host.uniq.each do |val| -%>
+  (DESCRIPTION =
+    (CONNECT_TIMEOUT=<%= @connect_timeout %>)(TRANSPORT_CONNECT_TIMEOUT=<%= @transport_connect_timeout %>)(RETRY_COUNT=<%= @retry_count %>)
+    (ADDRESS = (PROTOCOL = TCP)(HOST = <%= val %>)(PORT = <%= @port %>))
+    (CONNECT_DATA =
+      (SERVER = <% if @shared %>SHARED<% else %>DEDICATED<% end %>)
+      (SERVICE_NAME = <%= @dbname %>)
+  )
+<% end -%>
+)
+<% else -%>
+(DESCRIPTION =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = <%= @host %>)(PORT = <%= @port %>))
+  (CONNECT_DATA =
+    (SERVER = <% if @shared %>SHARED<% else %>DEDICATED<% end %>)
+    (SERVICE_NAME = <%= @dbname %>)
+  )
+)
+<% end %>

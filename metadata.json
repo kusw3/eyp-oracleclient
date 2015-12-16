@@ -1,0 +1,14 @@
+{
+  "name": "eyp-oracleclient",
+  "version": "0.1.9",
+  "author": "eyp",
+  "summary": "oracle client 12.1.0.1.0 installation",
+  "license": "Apache-2.0",
+  "source": "",
+  "project_page": null,
+  "issues_url": null,
+  "dependencies": [
+    {"name":"puppetlabs/stdlib","version_requirement":">= 1.0.0"},
+    {"name":"puppetlabs/concat","version_requirement":">= 1.2.3"}
+  ]
+}
