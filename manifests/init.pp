@@ -23,10 +23,18 @@ class oracleclient  (
 
   validate_re($exactversion, '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$', 'please, provide the --fucking-- EXACT version, thanks')
 
+  #$exactversion='12.1.0.1.0'
+
   if $exactversion =~ /^([0-9]+\.[0-9]+\.[0-9]+)\.[0-9]+\.[0-9]+$/
   {
     #$version='12.1.0',
     $version=$1
+  }
+
+  if $exactversion =~ /^([0-9]+)\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
+  {
+    #$majorversion='12',
+    $majorversion=$1
   }
 
   package { $dependencies:
@@ -49,11 +57,11 @@ class oracleclient  (
 
     user { $oracleuser:
       managehome => true,
-      gid => $oraclegroup,
-      groups => [ $oracleinstallgroup],
-      shell => "/bin/bash",
-      home => '/home/oracle',
-      require => Group[$oraclegroup],
+      gid        => $oraclegroup,
+      groups     => [ $oracleinstallgroup],
+      shell      => '/bin/bash',
+      home       => '/home/oracle',
+      require    => Group[$oraclegroup],
     }
   }
 
@@ -78,96 +86,96 @@ class oracleclient  (
   }
 
   file { $oraclehome:
-    ensure => 'directory',
-    owner => $oracleuser,
-    group => $oraclegroup,
-    mode => '0755',
+    ensure  => 'directory',
+    owner   => $oracleuser,
+    group   => $oraclegroup,
+    mode    => '0755',
     require => Exec["mkdir p ${oraclehome}"],
   }
 
   file { $oraclebase:
-    ensure => 'directory',
-    owner => $oracleuser,
-    group => $oraclegroup,
-    mode => '0755',
+    ensure  => 'directory',
+    owner   => $oracleuser,
+    group   => $oraclegroup,
+    mode    => '0755',
     require => Exec["mkdir p ${oraclebase}"],
   }
 
   file { $orainventory:
-    ensure => 'directory',
-    owner => $oracleuser,
-    group => $oraclegroup,
-    mode => '0770',
+    ensure  => 'directory',
+    owner   => $oracleuser,
+    group   => $oraclegroup,
+    mode    => '0770',
     require => Exec["mkdir p ${orainventory}"],
   }
 
   file { $srcdir:
-    ensure => 'directory',
-    owner => $oracleuser,
-    group => $oraclegroup,
-    mode => '0750',
+    ensure  => 'directory',
+    owner   => $oracleuser,
+    group   => $oraclegroup,
+    mode    => '0750',
     require => Exec["mkdir p ${srcdir}"],
   }
 
   file { "${oraclehome}/responsefile.rsp":
-    ensure => 'present',
-    owner => $oracleuser,
-    group => $oraclegroup,
-    mode => '0644',
-    content => template("oracleclient/responsefile12c.erb"),
+    ensure  => 'present',
+    owner   => $oracleuser,
+    group   => $oraclegroup,
+    mode    => '0644',
+    content => template("${module_name}/responsefile${majorversion}.erb"),
     require => [ File[$oraclehome], User[$oracleuser] ],
   }
 
   file { "${srcdir}/oracleclient-${version}.zip":
-    ensure => 'present',
-    owner => 'root',
-    group => 'root',
-    mode => '0400',
-    source => $package,
+    ensure  => 'present',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0400',
+    source  => $package,
     require => File[$srcdir],
   }
 
   exec { "unzip ${srcdir}/oracleclient-${version}.zip":
     command => "unzip ${srcdir}/oracleclient-${version}.zip" ,
-    cwd => $srcdir,
+    cwd     => $srcdir,
     require => [ Package[$dependencies], File["${srcdir}/oracleclient-${version}.zip"] ],
-    notify => Exec["runinstaller client ${version}"],
+    notify  => Exec["runinstaller client ${version}"],
     creates => "${srcdir}/client/runInstaller",
   }
 
 
   exec { "runinstaller client ${version}":
-    command => "su - ${oracleuser} -c '${srcdir}/client/runInstaller -showProgress -waitforcompletion -silent -noconfig -debug -force -responseFile ${oraclehome}/responsefile.rsp' > ${oraclehome}/.runinstaller.log 2>&1",
-    timeout => 0,
-    require => [ Exec["unzip ${srcdir}/oracleclient-${version}.zip"],
-                 File[ [ $oraclehome, $oraclebase, $orainventory, $srcdir, "${oraclehome}/responsefile.rsp" ] ]
-               ],
+    command     => "su - ${oracleuser} -c '${srcdir}/client/runInstaller -showProgress -waitforcompletion -silent -noconfig -debug -force -responseFile ${oraclehome}/responsefile.rsp' > ${oraclehome}/.runinstaller.log 2>&1",
+    timeout     => 0,
+    require     => [ Exec["unzip ${srcdir}/oracleclient-${version}.zip"],
+                  File[ [ $oraclehome, $oraclebase, $orainventory, $srcdir, "${oraclehome}/responsefile.rsp" ] ]
+                  ],
     refreshonly => true,
-    notify => Exec["runinstaller client ${version} rootsh"],
+    notify      => Exec["runinstaller client ${version} rootsh"],
   }
 
   exec { "runinstaller client ${version} rootsh":
-    command => "${oraclehome}/root.sh > ${oraclehome}/.rootsh.log 2>&1",
-    timeout => 0,
-    require => Exec["runinstaller client ${version}"],
+    command     => "${oraclehome}/root.sh > ${oraclehome}/.rootsh.log 2>&1",
+    timeout     => 0,
+    require     => Exec["runinstaller client ${version}"],
     refreshonly => true,
   }
 
   concat {"${oracleclient::oraclehome}/network/admin/tnsnames.ora":
-    ensure => 'present',
-    owner => $oracleuser,
-    group => $oraclegroup,
-    mode => '0644',
+    ensure  => 'present',
+    owner   => $oracleuser,
+    group   => $oraclegroup,
+    mode    => '0644',
     require => Exec[ [ "runinstaller client ${version}", "runinstaller client ${version} rootsh" ] ],
   }
 
   if($addtopath)
   {
     file { '/etc/profile.d/zz_puppetmanaget-oracle.sh':
-      ensure => 'present',
-      owner => 'root',
-      group => 'root',
-      mode => '0644',
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
       content => "export ORACLE_HOME=${oraclehome}\nexport PATH=\$PATH:${oraclehome}/bin\n",
       require => Exec["runinstaller client ${version} rootsh"],
     }
