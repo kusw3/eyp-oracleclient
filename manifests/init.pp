@@ -182,12 +182,6 @@ class oracleclient  (
     require => Exec[ [ "runinstaller client ${version}", "runinstaller client ${version} rootsh" ] ],
   }
 
-  concat::fragment{ "${oracleclient::oraclehome}/network/admin/tnsnames.ora full":
-    target  => "${oracleclient::oraclehome}/network/admin/tnsnames.ora",
-    order   => '00',
-    content => template("${module_name}/templates/tnsnames.erb"),
-  }
-
   if($addtopath)
   {
     file { '/etc/profile.d/zz_puppetmanaget-oracle.sh':

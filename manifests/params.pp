@@ -6,7 +6,7 @@ class oracleclient::params {
         {
       case $::operatingsystemrelease
       {
-        /^6.*$/:
+        /^[67].*$/:
         {
           $dependencies= [ 'unzip' , 'gawk' ]
         }
