@@ -30,8 +30,8 @@ define oracleclient::connectstring  (
 
   concat::fragment{ "tnsnames $csname":
     target  => "${oracleclient::oraclehome}/network/admin/tnsnames.ora",
-    order => '00',
-    content => template("oracleclient/tnsnames.erb"),
+    order   => '00',
+    content => template("${module_name}/tnsnames.erb"),
   }
 
 }

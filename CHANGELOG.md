@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.5
+
+* lint + clenaup
+
 ## 0.2.4
 
 * Corrected tnsnames.ora generation from template
