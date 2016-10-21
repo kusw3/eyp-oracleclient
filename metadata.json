@@ -1,6 +1,6 @@
 {
   "name": "eyp-oracleclient",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "eyp",
   "summary": "oracle client 12.1.0.1.0 installation",
   "license": "Apache-2.0",
