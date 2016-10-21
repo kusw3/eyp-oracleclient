@@ -28,7 +28,7 @@ define oracleclient::connectstring  (
     validate_array($csalias)
   }
 
-  concat::fragment{ "tnsnames $csname":
+  concat::fragment{ "tnsnames ${csname}":
     target  => "${oracleclient::oraclehome}/network/admin/tnsnames.ora",
     order   => '00',
     content => template("${module_name}/tnsnames.erb"),
