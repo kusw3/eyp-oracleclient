@@ -143,9 +143,22 @@ class oracleclient  (
     creates => "${srcdir}/client/runInstaller",
   }
 
+  # Selecting Installer command upon oracle major version
+  case $majorversion
+  {
+    '12':
+    {
+      $installer_command = "su - ${oracleuser} -c '${srcdir}/client/runInstaller -showProgress -waitforcompletion -silent -noconfig -debug -force -responseFile ${oraclehome}/responsefile.rsp' > ${oraclehome}/.runinstaller.log 2>&1"
+    }
+    '11':
+    {
+      $installer_command = "su - ${oracleuser} -c '${srcdir}/client/runInstaller -waitforcompletion -silent -noconfig -debug -force -responseFile ${oraclehome}/responsefile.rsp' > ${oraclehome}/.runinstaller.log 2>&1"
+    }
+    default: { fail("Unsupported installer for Oracle ${majorversion}!")  }
+  }
 
   exec { "runinstaller client ${version}":
-    command     => "su - ${oracleuser} -c '${srcdir}/client/runInstaller -showProgress -waitforcompletion -silent -noconfig -debug -force -responseFile ${oraclehome}/responsefile.rsp' > ${oraclehome}/.runinstaller.log 2>&1",
+    command     => $installer_command,
     timeout     => 0,
     require     => [ Exec["unzip ${srcdir}/oracleclient-${version}.zip"],
                   File[ [ $oraclehome, $oraclebase, $orainventory, $srcdir, "${oraclehome}/responsefile.rsp" ] ]
