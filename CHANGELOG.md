@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.2
+
+* Added selector for runInstaller command
+
 ## 0.2.1
 
 * added support for oracle 11c
