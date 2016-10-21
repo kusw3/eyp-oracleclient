@@ -152,7 +152,7 @@ class oracleclient  (
     }
     '11':
     {
-      $installer_command = "su - ${oracleuser} -c '${srcdir}/client/runInstaller -waitforcompletion -silent -noconfig -debug -force -responseFile ${oraclehome}/responsefile.rsp' > ${oraclehome}/.runinstaller.log 2>&1"
+      $installer_command = "su - ${oracleuser} -c '${srcdir}/client/runInstaller -waitforcompletion -silent -noconfig -debug -force -responseFile ${oraclehome}/responsefile.rsp' > ${oraclehome}/.runinstaller.log 2>&1 ; /bin/egrep -i 'Successfully Setup Software' ${oraclehome}/.runinstaller.log"
     }
     default: { fail("Unsupported installer for Oracle ${majorversion}!")  }
   }
