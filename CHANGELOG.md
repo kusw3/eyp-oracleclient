@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.4
+
+* Corrected tnsnames.ora generation from template
+
 ## 0.2.3
 
 * Modified runInstaller completion check for oracle11
