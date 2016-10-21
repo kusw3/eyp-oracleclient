@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.3
+
+* Modified runInstaller completion check for oracle11
+
 ## 0.2.2
 
 * Added selector for runInstaller command
