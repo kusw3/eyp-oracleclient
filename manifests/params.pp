@@ -3,7 +3,7 @@ class oracleclient::params {
   case $::osfamily
   {
     'redhat':
-        {
+    {
       case $::operatingsystemrelease
       {
         /^[67].*$/:
@@ -12,7 +12,6 @@ class oracleclient::params {
         }
         default: { fail("Unsupported RHEL/CentOS version! - $::operatingsystemrelease")  }
       }
-
     }
     'Debian':
     {
