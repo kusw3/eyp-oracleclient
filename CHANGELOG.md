@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.2.9
+
 ## 0.2.8
 
 * bugfix **version_with_underscore**
