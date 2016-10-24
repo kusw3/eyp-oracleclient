@@ -1,5 +1,6 @@
 class oracleclient  (
-                      $package,
+                      $package             = undef,
+                      $localfile           = undef,
                       $exactversion        = '12.1.0.1.0',
                       $oracleuser          = 'oracle',
                       $oraclegroup         = 'dba',
@@ -41,6 +42,16 @@ class oracleclient  (
   {
     #$majorversion='12',
     $majorversion=$1
+  }
+
+  if($localfile==undef) and ($package==undef)
+  {
+    fail('localfile (install file already in the local system) and package (remote file) are both undefined')
+  }
+
+  if($localfile!=undef) and ($package!=undef)
+  {
+    fail("Incompatible options: localfile(${localfile}) and package($package)")
   }
 
   package { $dependencies:
@@ -132,14 +143,26 @@ class oracleclient  (
     require => [ File[$oraclehome], User[$oracleuser] ],
   }
 
-  file { "${srcdir}/oracleclient-${version}.zip":
-    ensure  => 'present',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0400',
-    source  => $package,
-    require => File[$srcdir],
+  if($localfile!=undef)
+  {
+    file { "${srcdir}/oracleclient-${version}.zip":
+      ensure  => 'link',
+      target  => $localfile,
+      require => File[$srcdir],
+    }
   }
+  else
+  {
+    file { "${srcdir}/oracleclient-${version}.zip":
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0400',
+      source  => $package,
+      require => File[$srcdir],
+    }
+  }
+
 
   exec { "unzip ${srcdir}/oracleclient-${version}.zip":
     command => "unzip ${srcdir}/oracleclient-${version}.zip" ,

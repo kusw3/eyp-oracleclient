@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.7
+
+* added option **localfile** to be able to use a already existing file on the system as a source for **oracleclient package**
+
 ## 0.2.6
 
 * added **version_with_underscore** to generate responsefile for 11c
