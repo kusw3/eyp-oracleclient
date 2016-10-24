@@ -35,7 +35,7 @@ class oracleclient  (
   if $exactversion =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.[0-9]+\.[0-9]+$/
   {
     #$version='12_1_0',
-    $version_with_underscore=$1_$2_$3
+    $version_with_underscore="${1}_${2}_${3}"
   }
 
   if $exactversion =~ /^([0-9]+)\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
