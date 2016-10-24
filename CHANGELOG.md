@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.6
+
+* added **version_with_underscore** to generate responsefile for 11c
+
 ## 0.2.5
 
 * lint + clenaup
