@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.8
+
+* bugfix **version_with_underscore**
+
 ## 0.2.7
 
 * added option **localfile** to be able to use a already existing file on the system as a source for **oracleclient package**
