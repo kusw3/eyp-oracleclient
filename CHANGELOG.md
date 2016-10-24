@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.10
+
+* fixed dependency typo
+
 ## 0.2.9
 
 * added ldconfig configuration files using **eyp-ldconfig** (mandatory dependency)
