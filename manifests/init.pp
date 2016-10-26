@@ -223,4 +223,15 @@ class oracleclient  (
     }
   }
 
+  #/u01/app/product/11/client/lib
+  ldconfig::diradd { "${oraclehome}/lib":
+    type => 'oracleclient',
+  }
+
+  #/u01/app/oracle/client/11.2.0/
+  ldconfig::diradd { "${oraclebase}/oracle/client/${version}":
+    type => 'oracleclient',
+  }
+
+
 }
