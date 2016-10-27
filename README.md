@@ -1,4 +1,4 @@
-# oracleclient ![status ready](https://img.shields.io/badge/status-ready-brightgreen.svg)
+# oracleclient 
 
 #### Table of Contents
 
