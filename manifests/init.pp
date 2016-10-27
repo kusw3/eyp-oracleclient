@@ -153,13 +153,32 @@ class oracleclient  (
   }
   else
   {
-    file { "${srcdir}/oracleclient-${version}.zip":
-      ensure  => 'present',
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0400',
-      source  => $package,
-      require => File[$srcdir],
+    if $package =~ /^http/
+    {
+      exec { 'which wget eyp-oracleclient':
+        command => 'which wget',
+        unless  => 'which wget',
+        require => Exec["mkdir p ${srcdir}"],
+      }
+
+      exec { 'wget oracleclient package':
+        command => "wget ${package} -O ${srcdir}/oracleclient-${version}.zip",
+        creates => "${srcdir}/oracleclient-${version}.zip",
+        before  => Exec["unzip ${srcdir}/oracleclient-${version}.zip"],
+        require => Exec['which wget eyp-oracleclient'],
+      }
+    }
+    else
+    {
+      file { "${srcdir}/oracleclient-${version}.zip":
+        ensure  => 'present',
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0400',
+        source  => $package,
+        require => File[$srcdir],
+        before  => Exec["unzip ${srcdir}/oracleclient-${version}.zip"],
+      }
     }
   }
 
@@ -167,7 +186,7 @@ class oracleclient  (
   exec { "unzip ${srcdir}/oracleclient-${version}.zip":
     command => "unzip ${srcdir}/oracleclient-${version}.zip" ,
     cwd     => $srcdir,
-    require => [ Package[$dependencies], File["${srcdir}/oracleclient-${version}.zip"] ],
+    require => Package[$dependencies],
     notify  => Exec["runinstaller client ${version}"],
     creates => "${srcdir}/client/runInstaller",
   }
