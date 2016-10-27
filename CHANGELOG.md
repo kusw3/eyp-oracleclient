@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.11
+
+* allow URLs for **oracleclient::package**
+
 ## 0.2.10
 
 * fixed dependency typo
