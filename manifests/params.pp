@@ -3,16 +3,15 @@ class oracleclient::params {
   case $::osfamily
   {
     'redhat':
-        {
+    {
       case $::operatingsystemrelease
       {
-        /^6.*$/:
+        /^[67].*$/:
         {
           $dependencies= [ 'unzip' , 'gawk' ]
         }
         default: { fail("Unsupported RHEL/CentOS version! - $::operatingsystemrelease")  }
       }
-
     }
     'Debian':
     {

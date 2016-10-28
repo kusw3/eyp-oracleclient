@@ -1,9 +1,9 @@
 class oracleclient::sqlnet(
                             $invited_nodes,
-                            $oraclehome='/u01/app/product/12/client',
-                            $oracleuser='oracle',
-                            $oraclegroup='dba',
-                            $names = [ 'TZNAMES', 'LDAP', 'EZCONNECT' ],
+                            $oraclehome  = '/u01/app/product/12/client',
+                            $oracleuser  = 'oracle',
+                            $oraclegroup = 'dba',
+                            $names       = [ 'TZNAMES', 'LDAP', 'EZCONNECT' ],
                           ) inherits oracleclient::params {
   #
 

@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## 0.2.11
+
+* allow URLs for **oracleclient::package**
+
+## 0.2.10
+
+* fixed dependency typo
+
+## 0.2.9
+
+* added ldconfig configuration files using **eyp-ldconfig** (mandatory dependency)
+
+## 0.2.8
+
+* bugfix **version_with_underscore**
+
+## 0.2.7
+
+* added option **localfile** to be able to use a already existing file on the system as a source for **oracleclient package**
+
+## 0.2.6
+
+* added **version_with_underscore** to generate responsefile for 11c
+
+## 0.2.5
+
+* lint + clenaup
+
 ## 0.2.4
 
 * Corrected tnsnames.ora generation from template

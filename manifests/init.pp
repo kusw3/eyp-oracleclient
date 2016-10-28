@@ -1,17 +1,18 @@
 class oracleclient  (
-                      $exactversion='12.1.0.1.0',
-                      $oracleuser='oracle',
-                      $oraclegroup='dba',
-                      $oracleinstallgroup='oinstall',
-                      $oraclehome='/u01/app/product/12/client',
-                      $oraclebase='/u01/app',
-                      $orainventory='/u01/app/oraInventory',
-                      $srcdir='/u01/software',
-                      $languages=[ 'en' ],
-                      $package,
-                      $createusers=true,
-                      $addtopath=false,
-                      $software_to_install= [ 'oracle.rdbms.util', 'oracle.javavm.client', 'oracle.sqlplus',
+                      $package             = undef,
+                      $localfile           = undef,
+                      $exactversion        = '12.1.0.1.0',
+                      $oracleuser          = 'oracle',
+                      $oraclegroup         = 'dba',
+                      $oracleinstallgroup  = 'oinstall',
+                      $oraclehome          = '/u01/app/product/12/client',
+                      $oraclebase          = '/u01/app',
+                      $orainventory        = '/u01/app/oraInventory',
+                      $srcdir              = '/u01/software',
+                      $languages           = [ 'en' ],
+                      $createusers         = true,
+                      $addtopath           = false,
+                      $software_to_install = [ 'oracle.rdbms.util', 'oracle.javavm.client', 'oracle.sqlplus',
                                               'oracle.dbjava.jdbc', 'oracle.network.client', 'oracle.odbc' ],
                     )inherits params {
 
@@ -31,10 +32,26 @@ class oracleclient  (
     $version=$1
   }
 
+  if $exactversion =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.[0-9]+\.[0-9]+$/
+  {
+    #$version='12_1_0',
+    $version_with_underscore="${1}_${2}_${3}"
+  }
+
   if $exactversion =~ /^([0-9]+)\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
   {
     #$majorversion='12',
     $majorversion=$1
+  }
+
+  if($localfile==undef) and ($package==undef)
+  {
+    fail('localfile (install file already in the local system) and package (remote file) are both undefined')
+  }
+
+  if($localfile!=undef) and ($package!=undef)
+  {
+    fail("Incompatible options: localfile(${localfile}) and package($package)")
   }
 
   package { $dependencies:
@@ -126,19 +143,50 @@ class oracleclient  (
     require => [ File[$oraclehome], User[$oracleuser] ],
   }
 
-  file { "${srcdir}/oracleclient-${version}.zip":
-    ensure  => 'present',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0400',
-    source  => $package,
-    require => File[$srcdir],
+  if($localfile!=undef)
+  {
+    file { "${srcdir}/oracleclient-${version}.zip":
+      ensure  => 'link',
+      target  => $localfile,
+      require => File[$srcdir],
+    }
   }
+  else
+  {
+    if $package =~ /^http/
+    {
+      exec { 'which wget eyp-oracleclient':
+        command => 'which wget',
+        unless  => 'which wget',
+        require => Exec["mkdir p ${srcdir}"],
+      }
+
+      exec { 'wget oracleclient package':
+        command => "wget ${package} -O ${srcdir}/oracleclient-${version}.zip",
+        creates => "${srcdir}/oracleclient-${version}.zip",
+        before  => Exec["unzip ${srcdir}/oracleclient-${version}.zip"],
+        require => Exec['which wget eyp-oracleclient'],
+      }
+    }
+    else
+    {
+      file { "${srcdir}/oracleclient-${version}.zip":
+        ensure  => 'present',
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0400',
+        source  => $package,
+        require => File[$srcdir],
+        before  => Exec["unzip ${srcdir}/oracleclient-${version}.zip"],
+      }
+    }
+  }
+
 
   exec { "unzip ${srcdir}/oracleclient-${version}.zip":
     command => "unzip ${srcdir}/oracleclient-${version}.zip" ,
     cwd     => $srcdir,
-    require => [ Package[$dependencies], File["${srcdir}/oracleclient-${version}.zip"] ],
+    require => Package[$dependencies],
     notify  => Exec["runinstaller client ${version}"],
     creates => "${srcdir}/client/runInstaller",
   }
@@ -182,12 +230,6 @@ class oracleclient  (
     require => Exec[ [ "runinstaller client ${version}", "runinstaller client ${version} rootsh" ] ],
   }
 
-  concat::fragment{ "${oracleclient::oraclehome}/network/admin/tnsnames.ora full":
-    target  => "${oracleclient::oraclehome}/network/admin/tnsnames.ora",
-    order   => '00',
-    content => template("${module_name}/templates/tnsnames.erb"),
-  }
-
   if($addtopath)
   {
     file { '/etc/profile.d/zz_puppetmanaget-oracle.sh':
@@ -199,5 +241,16 @@ class oracleclient  (
       require => Exec["runinstaller client ${version} rootsh"],
     }
   }
+
+  #/u01/app/product/11/client/lib
+  ldconfig::diradd { "${oraclehome}/lib":
+    type => 'oracleclient',
+  }
+
+  #/u01/app/oracle/client/11.2.0/
+  ldconfig::diradd { "${oraclebase}/oracle/client/${version}":
+    type => 'oracleclient',
+  }
+
 
 }

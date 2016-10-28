@@ -1,16 +1,16 @@
-define oracleclient::connectstring  (
-                                      $csname=$name,
-                                      $csalias=undef,
-                                      $host,
-                                      $port='1521',
-                                      $dbname,
-                                      $shared=false,
-                                      $loadbalance='off',
-                                      $failover='on',
-                                      $connect_timeout='5',
-                                      $transport_connect_timeout='3',
-                                      $retry_count='3',
-                                    ) {
+define oracleclient::connectstring(
+                                    $host,
+                                    $dbname,
+                                    $csname                    = $name,
+                                    $csalias                   = undef,
+                                    $port                      = '1521',
+                                    $shared                    = false,
+                                    $loadbalance               = 'off',
+                                    $failover                  = 'on',
+                                    $connect_timeout           = '5',
+                                    $transport_connect_timeout = '3',
+                                    $retry_count               = '3',
+                                  ) {
 
   # example
   #
@@ -28,10 +28,10 @@ define oracleclient::connectstring  (
     validate_array($csalias)
   }
 
-  concat::fragment{ "tnsnames $csname":
+  concat::fragment{ "tnsnames ${csname}":
     target  => "${oracleclient::oraclehome}/network/admin/tnsnames.ora",
-    order => '00',
-    content => template("oracleclient/tnsnames.erb"),
+    order   => '00',
+    content => template("${module_name}/tnsnames.erb"),
   }
 
 }
